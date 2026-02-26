@@ -1,0 +1,22 @@
+project_id = "mxmgpoywomexvtguxuob"
+
+[functions.check-subscription]
+verify_jwt = false
+
+[functions.client-billing]
+verify_jwt = false
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.customer-portal]
+verify_jwt = false
+
+[functions.draft-kb-article]
+verify_jwt = false
+
+[functions.send-notification-email]
+verify_jwt = false
+
+[functions.suggest-reply]
+verify_jwt = false

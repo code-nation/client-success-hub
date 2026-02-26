@@ -1,0 +1,1 @@
+ALTER TABLE public.hour_allocations ADD COLUMN title text;
