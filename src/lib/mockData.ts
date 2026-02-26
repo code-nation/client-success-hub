@@ -166,7 +166,7 @@ export const mockTickets = [
   {
     id: 't1',
     title: 'Homepage not loading on mobile Safari',
-    description: 'Several users have reported that the homepage fails to load on iOS Safari 17. The page just shows a blank screen after the spinner. We need this fixed ASAP as it's impacting our conversion rate.',
+    description: 'Several users have reported that the homepage fails to load on iOS Safari 17. The page just shows a blank screen after the spinner. We need this fixed ASAP as it\'s impacting our conversion rate.',
     status: 'open',
     category: 'Technical',
     priority: 'urgent',
@@ -262,7 +262,7 @@ export const mockTickets = [
   {
     id: 't7',
     title: 'Logo and brand assets request for new campaign',
-    description: 'We're launching a summer campaign and need updated logo variations — white on transparent, dark on light, and colour on white — in SVG and PNG formats at 2x resolution.',
+    description: 'We\'re launching a summer campaign and need updated logo variations — white on transparent, dark on light, and colour on white — in SVG and PNG formats at 2x resolution.',
     status: 'open',
     category: 'Design',
     priority: 'medium',
@@ -278,7 +278,7 @@ export const mockTickets = [
   {
     id: 't8',
     title: 'Product page copy revisions',
-    description: 'Please review and update the copy on our top 10 product pages. The tone needs to be refreshed — more benefit-focused, less feature-led. I've left comments in the shared Google Doc.',
+    description: 'Please review and update the copy on our top 10 product pages. The tone needs to be refreshed — more benefit-focused, less feature-led. I\'ve left comments in the shared Google Doc.',
     status: 'waiting_on_client',
     category: 'Content',
     priority: 'medium',
@@ -294,7 +294,7 @@ export const mockTickets = [
   {
     id: 't9',
     title: 'Google Analytics 4 migration assistance',
-    description: 'We're still on UA and need to migrate to GA4 before the cutoff. Please set up the new property, migrate key goals as conversions, and verify the data layer is firing correctly.',
+    description: 'We\'re still on UA and need to migrate to GA4 before the cutoff. Please set up the new property, migrate key goals as conversions, and verify the data layer is firing correctly.',
     status: 'resolved',
     category: 'Analytics',
     priority: 'high',
