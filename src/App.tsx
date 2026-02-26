@@ -41,7 +41,7 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to="/ops" replace />} />
 
             {/* Client routes */}
             <Route path="/client" element={<Navigate to="/client/tickets" replace />} />
