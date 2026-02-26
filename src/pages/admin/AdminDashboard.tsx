@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePreviewMode } from '@/contexts/PreviewModeContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
+import { mockTickets, mockOrganizations } from '@/lib/mockData';
 import {
   Ticket,
   Users,
@@ -13,6 +16,7 @@ import {
   Clock,
   ChevronRight,
   TrendingUp,
+  Eye,
 } from 'lucide-react';
 
 interface TicketStats {
@@ -32,6 +36,7 @@ interface RecentTicket {
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
+  const { isPreviewMode } = usePreviewMode();
   const [ticketStats, setTicketStats] = useState<TicketStats>({
     total: 0,
     open: 0,
@@ -43,8 +48,28 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (isPreviewMode) {
+      setTicketStats({
+        total: mockTickets.length,
+        open: mockTickets.filter(t => t.status === 'open').length,
+        inProgress: mockTickets.filter(t => t.status === 'in_progress').length,
+        resolved: mockTickets.filter(t => t.status === 'resolved').length,
+      });
+      setClientCount(mockOrganizations.length);
+      setRecentTickets(
+        mockTickets.slice(0, 5).map(t => ({
+          id: t.id,
+          title: t.title,
+          status: t.status,
+          created_at: t.created_at,
+          organizations: t.organizations,
+        }))
+      );
+      setIsLoading(false);
+    } else {
+      fetchDashboardData();
+    }
+  }, [isPreviewMode]);
 
   async function fetchDashboardData() {
     try {
@@ -120,6 +145,13 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold">Admin Console</h1>
           <p className="text-muted-foreground">System overview and management</p>
         </div>
+
+        {isPreviewMode && (
+          <Alert className="border-amber-500/50 bg-amber-500/10">
+            <Eye className="h-4 w-4" />
+            <AlertDescription><strong>Preview Mode:</strong> Sample data shown.</AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>

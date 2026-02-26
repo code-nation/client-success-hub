@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import AssigneeSelect from '@/components/support/AssigneeSelect';
+import { mockTickets as allMockTickets } from '@/lib/mockData';
 import {
   Search, Eye, Clock, AlertCircle, Ticket, ChevronRight, RotateCcw,
 } from 'lucide-react';
@@ -30,14 +31,7 @@ interface TicketRow {
   organizations: { name: string } | null;
 }
 
-const mockTickets: TicketRow[] = [
-  { id: '1', title: 'Website not loading properly on mobile', status: 'open', category: 'Technical', created_at: new Date(Date.now() - 2*3600000).toISOString(), updated_at: new Date(Date.now() - 3600000).toISOString(), organization_id: '1', assigned_to_user_id: null, sla_due_at: new Date(Date.now() + 4*3600000).toISOString(), organizations: { name: 'Acme Corp' } },
-  { id: '2', title: 'Email campaign setup help', status: 'in_progress', category: 'Marketing', created_at: new Date(Date.now() - 86400000).toISOString(), updated_at: new Date(Date.now() - 7200000).toISOString(), organization_id: '2', assigned_to_user_id: 'user-1', sla_due_at: new Date(Date.now() + 12*3600000).toISOString(), organizations: { name: 'TechStart Inc' } },
-  { id: '3', title: 'SEO optimization questions', status: 'waiting_on_client', category: 'SEO', created_at: new Date(Date.now() - 3*86400000).toISOString(), updated_at: new Date(Date.now() - 43200000).toISOString(), organization_id: '3', assigned_to_user_id: 'user-2', sla_due_at: null, organizations: { name: 'Global Services' } },
-  { id: '4', title: 'Social media integration broken', status: 'open', category: 'Technical', created_at: new Date(Date.now() - 1800000).toISOString(), updated_at: new Date(Date.now() - 900000).toISOString(), organization_id: '1', assigned_to_user_id: null, sla_due_at: new Date(Date.now() + 2*3600000).toISOString(), organizations: { name: 'Acme Corp' } },
-  { id: '5', title: 'Monthly report request', status: 'in_progress', category: 'Reporting', created_at: new Date(Date.now() - 2*86400000).toISOString(), updated_at: new Date(Date.now() - 21600000).toISOString(), organization_id: '4', assigned_to_user_id: 'user-1', sla_due_at: new Date(Date.now() + 86400000).toISOString(), organizations: { name: 'Local Business' } },
-  { id: '6', title: 'DNS records need updating', status: 'open', category: 'Technical', created_at: new Date(Date.now() - 4*3600000).toISOString(), updated_at: new Date(Date.now() - 2*3600000).toISOString(), organization_id: '5', assigned_to_user_id: null, sla_due_at: new Date(Date.now() - 3600000).toISOString(), organizations: { name: 'Startup XYZ' } },
-];
+const mockTickets: TicketRow[] = allMockTickets as unknown as TicketRow[];
 
 export default function AdminTicketTriage() {
   const { user } = useAuth();

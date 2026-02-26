@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { mockKBArticles } from '@/lib/mockData';
 import { Eye, FileText, Check, X, Edit, Trash2, Search } from 'lucide-react';
 
 interface KBArticle {
@@ -25,12 +26,17 @@ interface KBArticle {
   category_name?: string;
 }
 
-const mockArticles: KBArticle[] = [
-  { id: '1', title: 'How to Resolve Mobile Display Issues', slug: 'mobile-display', excerpt: 'A guide to fixing responsive layout problems.', content: '# Mobile Display Issues\n\nFollow these steps...', is_published: true, is_featured: true, created_at: new Date(Date.now() - 7*86400000).toISOString(), category_name: 'Technical' },
-  { id: '2', title: 'Setting Up Email Campaigns', slug: 'email-campaigns', excerpt: 'Step-by-step email campaign configuration.', content: '# Email Campaigns\n\nStart by...', is_published: true, is_featured: false, created_at: new Date(Date.now() - 14*86400000).toISOString(), category_name: 'Marketing' },
-  { id: '3', title: 'DNS Configuration Guide', slug: 'dns-config', excerpt: 'How to update your DNS records.', content: '# DNS Configuration\n\nLogin to your...', is_published: false, is_featured: false, created_at: new Date(Date.now() - 86400000).toISOString(), category_name: 'Technical' },
-  { id: '4', title: 'Understanding SEO Basics', slug: 'seo-basics', excerpt: null, content: '# SEO Basics\n\nSEO stands for...', is_published: false, is_featured: false, created_at: new Date(Date.now() - 3600000).toISOString(), category_name: 'SEO' },
-];
+const mockArticles: KBArticle[] = mockKBArticles.map(a => ({
+  id: a.id,
+  title: a.title,
+  slug: a.slug,
+  excerpt: a.excerpt,
+  content: a.content,
+  is_published: a.is_published,
+  is_featured: a.is_featured,
+  created_at: a.created_at,
+  category_name: a.kb_categories?.name ?? undefined,
+}));
 
 export default function AdminContent() {
   const { isPreviewMode } = usePreviewMode();

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
+import { mockOrganizations, mockTickets } from '@/lib/mockData';
 import { Search, Eye, Building2, ChevronRight, Users } from 'lucide-react';
 
 interface ClientRow {
@@ -17,13 +18,13 @@ interface ClientRow {
   openTickets: number;
 }
 
-const mockClients: ClientRow[] = [
-  { id: '1', name: 'Acme Corp', account_status: 'active', website: 'acme.com', openTickets: 2 },
-  { id: '2', name: 'TechStart Inc', account_status: 'active', website: 'techstart.io', openTickets: 1 },
-  { id: '3', name: 'Global Services', account_status: 'active', website: 'globalservices.com', openTickets: 0 },
-  { id: '4', name: 'Local Business', account_status: 'paused', website: null, openTickets: 1 },
-  { id: '5', name: 'Startup XYZ', account_status: 'overdue', website: 'startupxyz.com', openTickets: 0 },
-];
+const mockClients: ClientRow[] = mockOrganizations.map(org => ({
+  id: org.id,
+  name: org.name,
+  account_status: org.account_status,
+  website: org.website,
+  openTickets: mockTickets.filter(t => t.organization_id === org.id && ['open', 'in_progress', 'waiting_on_client'].includes(t.status)).length,
+}));
 
 export default function SupportClients() {
   const { isPreviewMode } = usePreviewMode();

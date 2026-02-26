@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { mockStaff as allMockStaff } from '@/lib/mockData';
 import { Eye, Users, UserPlus, Trash2, Loader2, Shield, ShieldCheck } from 'lucide-react';
 
 interface StaffMember {
@@ -21,11 +22,7 @@ interface StaffMember {
   full_name: string | null;
 }
 
-const mockStaff: StaffMember[] = [
-  { id: '1', user_id: 'u1', role: 'admin', email: 'admin@agency.com', full_name: 'Sarah Admin' },
-  { id: '2', user_id: 'u2', role: 'support', email: 'sarah@agency.com', full_name: 'Sarah Chen' },
-  { id: '3', user_id: 'u3', role: 'support', email: 'mike@agency.com', full_name: 'Mike Johnson' },
-];
+const mockStaff: StaffMember[] = allMockStaff;
 
 const roleConfig: Record<string, { label: string; icon: React.ReactNode; variant: 'default' | 'secondary' | 'outline' }> = {
   admin: { label: 'Admin', icon: <ShieldCheck className="h-3 w-3" />, variant: 'default' },

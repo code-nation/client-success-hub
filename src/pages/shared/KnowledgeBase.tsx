@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { mockKBCategories, mockKBArticles } from '@/lib/mockData';
 import {
   Search,
   BookOpen,
@@ -54,23 +55,9 @@ interface KBArticle {
   kb_categories?: { name: string; slug: string } | null;
 }
 
-// Mock data
-const mockCategories: KBCategory[] = [
-  { id: '1', name: 'Getting Started', slug: 'getting-started', description: 'New to our services? Start here.', icon: '🚀', sort_order: 0 },
-  { id: '2', name: 'Website Management', slug: 'website-management', description: 'Managing your website content and updates.', icon: '🌐', sort_order: 1 },
-  { id: '3', name: 'SEO & Marketing', slug: 'seo-marketing', description: 'Search engine optimization and digital marketing tips.', icon: '📈', sort_order: 2 },
-  { id: '4', name: 'Email & Integrations', slug: 'email-integrations', description: 'Setting up email campaigns and third-party integrations.', icon: '📧', sort_order: 3 },
-  { id: '5', name: 'Billing & Account', slug: 'billing-account', description: 'Subscription, invoices, and account management.', icon: '💳', sort_order: 4 },
-];
-
-const mockArticles: KBArticle[] = [
-  { id: '1', title: 'How to submit a support ticket', slug: 'submit-ticket', excerpt: 'Learn how to create and track support requests through your client portal.', content: '# How to Submit a Support Ticket\n\n1. Navigate to **Support Tickets** in the sidebar\n2. Click **New Ticket**\n3. Fill in the title, category, priority, and description\n4. Optionally attach files\n5. Click **Submit**\n\nYou\'ll receive updates via email as your ticket progresses.', is_featured: true, published_at: '2025-01-15T00:00:00Z', created_at: '2025-01-15T00:00:00Z', view_count: 245, category_id: '1', kb_categories: { name: 'Getting Started', slug: 'getting-started' } },
-  { id: '2', title: 'Understanding your retainer hours', slug: 'retainer-hours', excerpt: 'A guide to how retainer hours work, how they\'re tracked, and what happens when you run low.', content: '# Understanding Your Retainer Hours\n\nYour retainer includes a set number of hours each billing period...\n\n## How Hours Are Tracked\nEvery task our team works on is logged with time spent. You can see this in your **Hours & Usage** dashboard.\n\n## Running Low?\nWhen you\'re at 80% usage, you\'ll see a warning. Contact us to add more hours.', is_featured: true, published_at: '2025-01-20T00:00:00Z', created_at: '2025-01-20T00:00:00Z', view_count: 189, category_id: '1', kb_categories: { name: 'Getting Started', slug: 'getting-started' } },
-  { id: '3', title: 'Requesting website content updates', slug: 'content-updates', excerpt: 'How to request changes to your website text, images, and pages.', content: null, is_featured: false, published_at: '2025-02-01T00:00:00Z', created_at: '2025-02-01T00:00:00Z', view_count: 102, category_id: '2', kb_categories: { name: 'Website Management', slug: 'website-management' } },
-  { id: '4', title: 'SEO basics: What we do for you', slug: 'seo-basics', excerpt: 'An overview of the SEO services included in your retainer and how to request additional work.', content: null, is_featured: false, published_at: '2025-02-05T00:00:00Z', created_at: '2025-02-05T00:00:00Z', view_count: 78, category_id: '3', kb_categories: { name: 'SEO & Marketing', slug: 'seo-marketing' } },
-  { id: '5', title: 'Setting up email campaigns', slug: 'email-campaigns', excerpt: 'Step-by-step guide to planning and launching email marketing campaigns with our team.', content: null, is_featured: false, published_at: '2025-02-10T00:00:00Z', created_at: '2025-02-10T00:00:00Z', view_count: 64, category_id: '4', kb_categories: { name: 'Email & Integrations', slug: 'email-integrations' } },
-  { id: '6', title: 'How to update your payment method', slug: 'update-payment', excerpt: 'Update your credit card or payment details through the client portal.', content: null, is_featured: false, published_at: '2025-02-12T00:00:00Z', created_at: '2025-02-12T00:00:00Z', view_count: 156, category_id: '5', kb_categories: { name: 'Billing & Account', slug: 'billing-account' } },
-];
+// Mock data — imported from central mockData
+const mockCategories: KBCategory[] = mockKBCategories;
+const mockArticles: KBArticle[] = mockKBArticles;
 
 interface KnowledgeBaseProps {
   role: 'client' | 'support' | 'ops';

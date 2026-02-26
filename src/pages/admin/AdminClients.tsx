@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { mockClientRows } from '@/lib/mockData';
 import { Search, Eye, Users, Clock, Building2, Edit, Plus, Minus, UserPlus } from 'lucide-react';
 
 interface ClientRow {
@@ -26,11 +27,7 @@ interface ClientRow {
   memberCount: number;
 }
 
-const mockClients: ClientRow[] = [
-  { id: '1', name: 'Acme Corp', account_status: 'active', website: 'acme.com', totalHours: 40, usedHours: 35, openTickets: 2, memberCount: 3 },
-  { id: '2', name: 'TechStart Inc', account_status: 'active', website: 'techstart.io', totalHours: 30, usedHours: 24, openTickets: 1, memberCount: 2 },
-  { id: '3', name: 'Global Services', account_status: 'overdue', website: 'globalservices.com', totalHours: 50, usedHours: 48, openTickets: 0, memberCount: 5 },
-];
+const mockClients: ClientRow[] = mockClientRows;
 
 export default function AdminClients() {
   const { isPreviewMode } = usePreviewMode();

@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { mockOrganizations, mockHourAllocations, mockTickets as allMockTickets } from '@/lib/mockData';
 import {
   ArrowLeft,
   Building2,
@@ -105,35 +106,36 @@ interface StripeInvoice {
 }
 
 // Mock data
-const mockOrg: OrgDetails = {
-  id: '1', name: 'Acme Corp', account_status: 'active', website: 'https://acme.com',
-  notes: null, payment_overdue_since: null, billing_email: 'billing@acme.com',
-  billing_address: '123 Business St, Suite 400\nNew York, NY 10001',
-  primary_contact_name: 'Jane Doe', primary_contact_email: 'jane@acme.com',
-  primary_contact_phone: '+1 555-0123', stripe_customer_id: 'cus_mock',
-};
-
-const mockAllocations: HourAllocation[] = [
-  { id: '1', total_hours: 40, used_hours: 28, period_start: new Date(Date.now() - 15 * 86400000).toISOString().split('T')[0], period_end: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0], agreed_hourly_rate: 150, title: 'Website Redesign', notes: null },
-  { id: '2', total_hours: 40, used_hours: 38, period_start: new Date(Date.now() - 45 * 86400000).toISOString().split('T')[0], period_end: new Date(Date.now() - 16 * 86400000).toISOString().split('T')[0], agreed_hourly_rate: 150, title: 'Q4 Marketing Campaign', notes: 'Exceeded allocation by 2h' },
-];
-
-const mockTickets: TicketItem[] = [
-  { id: '1', title: 'Website not loading on mobile', status: 'open', created_at: new Date(Date.now() - 2 * 3600000).toISOString(), updated_at: new Date(Date.now() - 3600000).toISOString() },
-  { id: '2', title: 'Email campaign setup help', status: 'waiting_on_client', created_at: new Date(Date.now() - 86400000).toISOString(), updated_at: new Date(Date.now() - 7200000).toISOString() },
-  { id: '3', title: 'Logo redesign feedback', status: 'closed', created_at: new Date(Date.now() - 7 * 86400000).toISOString(), updated_at: new Date(Date.now() - 3 * 86400000).toISOString() },
-  { id: '4', title: 'Social media assets for launch', status: 'open', created_at: new Date(Date.now() - 2 * 86400000).toISOString(), updated_at: new Date(Date.now() - 43200000).toISOString() },
-  { id: '5', title: 'DNS records need updating', status: 'closed', created_at: new Date(Date.now() - 10 * 86400000).toISOString(), updated_at: new Date(Date.now() - 5 * 86400000).toISOString() },
-];
-
-const mockSubscriptions: StripeSubscription[] = [
-  { id: 'sub_1', status: 'active', current_period_start: new Date(Date.now() - 10 * 86400000).toISOString(), current_period_end: new Date(Date.now() + 20 * 86400000).toISOString(), cancel_at_period_end: false, items: [{ price_amount: 299900, price_currency: 'usd', price_interval: 'month', product_name: 'Premium Support Plan' }] },
-];
-
-const mockInvoices: StripeInvoice[] = [
-  { id: 'inv_1', number: 'INV-0042', status: 'paid', amount_due: 299900, amount_paid: 299900, currency: 'usd', created: new Date(Date.now() - 10 * 86400000).toISOString(), due_date: null, hosted_invoice_url: '#' },
-  { id: 'inv_2', number: 'INV-0041', status: 'paid', amount_due: 299900, amount_paid: 299900, currency: 'usd', created: new Date(Date.now() - 40 * 86400000).toISOString(), due_date: null, hosted_invoice_url: '#' },
-];
+// Build mock data per org from centralized data
+function getMockOrgData(id: string) {
+  const org = mockOrganizations.find(o => o.id === id) ?? mockOrganizations[0];
+  return {
+    org: {
+      id: org.id, name: org.name, account_status: org.account_status, website: org.website,
+      notes: org.notes, payment_overdue_since: org.payment_overdue_since,
+      billing_email: org.billing_email, billing_address: org.billing_address,
+      primary_contact_name: org.primary_contact_name, primary_contact_email: org.primary_contact_email,
+      primary_contact_phone: org.primary_contact_phone, stripe_customer_id: org.stripe_customer_id,
+    } as OrgDetails,
+    allocations: mockHourAllocations
+      .filter(a => a.organization_id === org.id)
+      .map(a => ({ id: a.id, total_hours: a.total_hours, used_hours: a.used_hours, period_start: a.period_start, period_end: a.period_end, agreed_hourly_rate: a.agreed_hourly_rate, title: a.title, notes: a.notes })) as HourAllocation[],
+    tickets: allMockTickets
+      .filter(t => t.organization_id === org.id)
+      .map(t => ({ id: t.id, title: t.title, status: t.status, created_at: t.created_at, updated_at: t.updated_at })) as TicketItem[],
+    subscriptions: [{
+      id: `sub_${org.id}`, status: 'active',
+      current_period_start: new Date(Date.now() - 10 * 86400000).toISOString(),
+      current_period_end: new Date(Date.now() + 20 * 86400000).toISOString(),
+      cancel_at_period_end: false,
+      items: [{ price_amount: 299900, price_currency: 'usd', price_interval: 'month', product_name: 'Retainer — Pro Plan' }],
+    }] as StripeSubscription[],
+    invoices: [
+      { id: `inv_${org.id}_1`, number: `INV-${String(40 + parseInt(org.id)).padStart(4, '0')}`, status: 'paid', amount_due: 299900, amount_paid: 299900, currency: 'usd', created: new Date(Date.now() - 10 * 86400000).toISOString(), due_date: null, hosted_invoice_url: '#' },
+      { id: `inv_${org.id}_2`, number: `INV-${String(39 + parseInt(org.id)).padStart(4, '0')}`, status: 'paid', amount_due: 299900, amount_paid: 299900, currency: 'usd', created: new Date(Date.now() - 40 * 86400000).toISOString(), due_date: null, hosted_invoice_url: '#' },
+    ] as StripeInvoice[],
+  };
+}
 
 interface ClientProfileProps {
   role: 'support' | 'admin' | 'ops';
@@ -181,16 +183,19 @@ export default function ClientProfile({ role }: ClientProfileProps) {
 
   useEffect(() => {
     if (isPreviewMode) {
-      setOrg(mockOrg);
-      setAllocations(mockAllocations);
-      setTickets(mockTickets);
-      setSubscriptions(mockSubscriptions);
-      setInvoices(mockInvoices);
+      const data = getMockOrgData(orgId ?? '1');
+      setOrg(data.org);
+      setAllocations(data.allocations);
+      setTickets(data.tickets);
+      setSubscriptions(data.subscriptions);
+      setInvoices(data.invoices);
       setHasStripe(true);
-      setTicketStats({ total: 3, open: 1, closed: 1 });
+      const openCount = data.tickets.filter(t => ['open', 'in_progress', 'waiting_on_client'].includes(t.status)).length;
+      const closedCount = data.tickets.filter(t => ['resolved', 'closed'].includes(t.status)).length;
+      setTicketStats({ total: data.tickets.length, open: openCount, closed: closedCount });
       setMembers([
-        { id: 'm1', user_id: 'u1', email: 'jane@acme.com', full_name: 'Jane Doe', is_primary_contact: true },
-        { id: 'm2', user_id: 'u2', email: 'bob@acme.com', full_name: 'Bob Smith', is_primary_contact: false },
+        { id: 'm1', user_id: 'client-u1', email: data.org.primary_contact_email ?? 'contact@client.com', full_name: data.org.primary_contact_name, is_primary_contact: true },
+        { id: 'm2', user_id: 'client-u2', email: `accounts@${data.org.website?.replace('https://', '') ?? 'client.com'}`, full_name: null, is_primary_contact: false },
       ]);
       setIsLoading(false);
     } else if (orgId) {

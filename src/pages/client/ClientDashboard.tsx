@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePreviewMode } from '@/contexts/PreviewModeContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import PaymentLockout from '@/components/PaymentLockout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
+import { mockOrganizations, mockHourAllocations, mockTickets } from '@/lib/mockData';
 import {
   Clock,
   Ticket,
@@ -15,6 +18,7 @@ import {
   Plus,
   ChevronRight,
   CreditCard,
+  Eye,
 } from 'lucide-react';
 
 interface HourAllocation {
@@ -42,6 +46,7 @@ interface Organization {
 
 export default function ClientDashboard() {
   const { user, profile } = useAuth();
+  const { isPreviewMode } = usePreviewMode();
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [hourAllocation, setHourAllocation] = useState<HourAllocation | null>(null);
   const [recentTickets, setRecentTickets] = useState<TicketSummary[]>([]);
@@ -49,10 +54,33 @@ export default function ClientDashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
+    if (isPreviewMode) {
+      const previewOrg = mockOrganizations[0]; // Acme Corp as the demo client
+      setOrganization({
+        id: previewOrg.id,
+        name: previewOrg.name,
+        account_status: previewOrg.account_status,
+        payment_overdue_since: previewOrg.payment_overdue_since,
+        stripe_customer_id: previewOrg.stripe_customer_id,
+      });
+      const alloc = mockHourAllocations.find(a => a.organization_id === '1' && !a.id.includes('prev'));
+      if (alloc) {
+        setHourAllocation({
+          id: alloc.id,
+          total_hours: alloc.total_hours,
+          used_hours: alloc.used_hours,
+          period_start: alloc.period_start,
+          period_end: alloc.period_end,
+        });
+      }
+      const orgTickets = mockTickets.filter(t => t.organization_id === '1');
+      setRecentTickets(orgTickets.slice(0, 5).map(t => ({ id: t.id, title: t.title, status: t.status, created_at: t.created_at })));
+      setOpenTicketCount(orgTickets.filter(t => ['open', 'in_progress', 'waiting_on_client'].includes(t.status)).length);
+      setIsLoading(false);
+    } else if (user) {
       fetchDashboardData();
     }
-  }, [user]);
+  }, [user, isPreviewMode]);
 
   async function fetchDashboardData() {
     try {
@@ -168,10 +196,17 @@ export default function ClientDashboard() {
           />
         )}
 
+        {isPreviewMode && (
+          <Alert className="border-amber-500/50 bg-amber-500/10">
+            <Eye className="h-4 w-4" />
+            <AlertDescription><strong>Preview Mode:</strong> Showing Acme Corp's dashboard as the demo client.</AlertDescription>
+          </Alert>
+        )}
+
         {/* Welcome header */}
         <div>
           <h1 className="text-2xl font-bold">
-            Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}!
+            Welcome back, {isPreviewMode ? 'Jessica' : (profile?.full_name?.split(' ')[0] || 'there')}!
           </h1>
           <p className="text-muted-foreground">
             {organization?.name || 'Your organization'} dashboard

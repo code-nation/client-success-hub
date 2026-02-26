@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
+import { mockHourAllocations } from '@/lib/mockData';
 import { FolderKanban, ChevronRight, Loader2 } from 'lucide-react';
 
 interface HourAllocation {
@@ -33,37 +34,19 @@ export default function ClientHours() {
   async function fetchAllocations() {
     try {
       if (isPreviewMode) {
-        // Provide dummy data for preview
-        const dummyAllocations: HourAllocation[] = [
-          {
-            id: 'preview-1',
-            title: 'Website Redesign',
-            total_hours: 40,
-            used_hours: 28.5,
-            period_start: new Date(Date.now() - 15 * 86400000).toISOString().split('T')[0],
-            period_end: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
-            organization_id: 'preview-org',
-          },
-          {
-            id: 'preview-2',
-            title: 'Marketing Campaign',
-            total_hours: 20,
-            used_hours: 20,
-            period_start: new Date(Date.now() - 60 * 86400000).toISOString().split('T')[0],
-            period_end: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0],
-            organization_id: 'preview-org',
-          },
-          {
-            id: 'preview-3',
-            title: 'API Integration',
-            total_hours: 30,
-            used_hours: 5,
-            period_start: new Date(Date.now() - 5 * 86400000).toISOString().split('T')[0],
-            period_end: new Date(Date.now() + 25 * 86400000).toISOString().split('T')[0],
-            organization_id: 'preview-org',
-          },
-        ];
-        setAllocations(dummyAllocations);
+        // Show Acme Corp's allocations (org id '1') as the demo client
+        const acmeAllocations = mockHourAllocations
+          .filter(a => a.organization_id === '1')
+          .map(a => ({
+            id: a.id,
+            title: a.title,
+            total_hours: a.total_hours,
+            used_hours: a.used_hours,
+            period_start: a.period_start,
+            period_end: a.period_end,
+            organization_id: a.organization_id,
+          }));
+        setAllocations(acmeAllocations);
         setIsLoading(false);
         return;
       }

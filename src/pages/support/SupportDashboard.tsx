@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePreviewMode } from '@/contexts/PreviewModeContext';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
+import { mockTickets } from '@/lib/mockData';
 import {
   Ticket,
   Users,
   Clock,
   ChevronRight,
   AlertCircle,
+  Eye,
 } from 'lucide-react';
 
 interface TicketWithOrg {
@@ -27,16 +31,26 @@ interface TicketWithOrg {
 
 export default function SupportDashboard() {
   const { user, profile } = useAuth();
+  const { isPreviewMode } = usePreviewMode();
   const [myTickets, setMyTickets] = useState<TicketWithOrg[]>([]);
   const [unassignedCount, setUnassignedCount] = useState(0);
   const [myOpenCount, setMyOpenCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
+    if (isPreviewMode) {
+      // Show tickets assigned to "Sarah Chen" (u2) as the demo support user
+      const assigned = mockTickets.filter(
+        t => t.assigned_to_user_id === 'u2' && ['open', 'in_progress', 'waiting_on_client'].includes(t.status)
+      ) as unknown as TicketWithOrg[];
+      setMyTickets(assigned);
+      setMyOpenCount(assigned.length);
+      setUnassignedCount(mockTickets.filter(t => !t.assigned_to_user_id && ['open', 'in_progress'].includes(t.status)).length);
+      setIsLoading(false);
+    } else if (user) {
       fetchDashboardData();
     }
-  }, [user]);
+  }, [user, isPreviewMode]);
 
   async function fetchDashboardData() {
     try {
@@ -86,12 +100,19 @@ export default function SupportDashboard() {
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-2xl font-bold">
-            Welcome, {profile?.full_name?.split(' ')[0] || 'Support'}
+            Welcome, {isPreviewMode ? 'Sarah' : (profile?.full_name?.split(' ')[0] || 'Support')}
           </h1>
           <p className="text-muted-foreground">
             Here's your ticket queue overview
           </p>
         </div>
+
+        {isPreviewMode && (
+          <Alert className="border-amber-500/50 bg-amber-500/10">
+            <Eye className="h-4 w-4" />
+            <AlertDescription><strong>Preview Mode:</strong> Showing Sarah Chen's queue as the demo support user.</AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card>

@@ -21,6 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import AssigneeSelect from '@/components/support/AssigneeSelect';
+import { mockTickets as allMockTickets, mockStaff } from '@/lib/mockData';
 import {
   Ticket,
   Search,
@@ -64,12 +65,7 @@ interface StaffProfile {
   email: string;
 }
 
-const mockTickets: TicketWithOrg[] = [
-  { id: '1', title: 'Website not loading properly on mobile', status: 'open', category: null, created_at: new Date(Date.now() - 2 * 3600000).toISOString(), updated_at: new Date(Date.now() - 3600000).toISOString(), sla_due_at: new Date(Date.now() + 86400000).toISOString(), organization_id: '1', assigned_to_user_id: null, organizations: { name: 'Acme Corp' }, assigned_user: null },
-  { id: '2', title: 'Need help with email campaign setup', status: 'open', category: null, created_at: new Date(Date.now() - 86400000).toISOString(), updated_at: new Date(Date.now() - 7200000).toISOString(), sla_due_at: null, organization_id: '2', assigned_to_user_id: 'current-user', organizations: { name: 'TechStart Inc' }, assigned_user: { full_name: 'Sarah Chen', avatar_url: null, email: 'sarah@agency.com' } },
-  { id: '3', title: 'SEO optimization questions', status: 'waiting_on_client', category: null, created_at: new Date(Date.now() - 3 * 86400000).toISOString(), updated_at: new Date(Date.now() - 43200000).toISOString(), sla_due_at: null, organization_id: '3', assigned_to_user_id: 'current-user', organizations: { name: 'Global Services' }, assigned_user: { full_name: 'Sarah Chen', avatar_url: null, email: 'sarah@agency.com' } },
-  { id: '4', title: 'Monthly report request', status: 'closed', category: null, created_at: new Date(Date.now() - 7 * 86400000).toISOString(), updated_at: new Date(Date.now() - 2 * 86400000).toISOString(), sla_due_at: null, organization_id: '1', assigned_to_user_id: 'other-user', organizations: { name: 'Acme Corp' }, assigned_user: { full_name: 'Mike Johnson', avatar_url: null, email: 'mike@agency.com' } },
-];
+const mockTickets: TicketWithOrg[] = allMockTickets as unknown as TicketWithOrg[];
 
 export default function SupportTickets() {
   const { user } = useAuth();
@@ -103,10 +99,11 @@ export default function SupportTickets() {
   useEffect(() => {
     if (isPreviewMode) {
       setTickets(mockTickets);
-      setStaffProfiles([
-        { user_id: 'current-user', full_name: 'Sarah Chen', email: 'sarah@agency.com' },
-        { user_id: 'other-user', full_name: 'Mike Johnson', email: 'mike@agency.com' },
-      ]);
+      setStaffProfiles(
+        mockStaff
+          .filter(s => ['support', 'admin'].includes(s.role))
+          .map(s => ({ user_id: s.user_id, full_name: s.full_name, email: s.email }))
+      );
       setIsLoading(false);
     } else if (user) {
       fetchTickets();

@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePreviewMode } from '@/contexts/PreviewModeContext';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { mockDocuments } from '@/lib/mockData';
 
 interface DocumentItem {
   id: string;
@@ -25,12 +26,7 @@ interface DocumentItem {
   uploaded_by_user_id: string;
 }
 
-const previewDocuments: DocumentItem[] = [
-  { id: 'doc-1', file_name: 'Brand_Guidelines_v2.pdf', file_path: '', file_size: 2400000, content_type: 'application/pdf', description: 'Latest brand guidelines including logo usage and color palette', created_at: new Date(Date.now() - 5 * 86400000).toISOString(), uploaded_by_user_id: 'preview' },
-  { id: 'doc-2', file_name: 'Q4_Report.xlsx', file_path: '', file_size: 850000, content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', description: 'Quarterly performance report', created_at: new Date(Date.now() - 12 * 86400000).toISOString(), uploaded_by_user_id: 'preview' },
-  { id: 'doc-3', file_name: 'Homepage_Mockup.png', file_path: '', file_size: 3200000, content_type: 'image/png', description: 'Approved homepage redesign mockup', created_at: new Date(Date.now() - 20 * 86400000).toISOString(), uploaded_by_user_id: 'preview' },
-  { id: 'doc-4', file_name: 'Service_Agreement_2025.pdf', file_path: '', file_size: 540000, content_type: 'application/pdf', description: 'Signed service agreement', created_at: new Date(Date.now() - 30 * 86400000).toISOString(), uploaded_by_user_id: 'preview' },
-];
+const previewDocuments: DocumentItem[] = mockDocuments;
 
 function fileIcon(contentType: string | null) {
   if (!contentType) return <File className="h-5 w-5 text-muted-foreground" />;
