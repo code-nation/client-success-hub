@@ -27,28 +27,52 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const MOCK_USER: User = {
+  id: '00000000-0000-0000-0000-000000000000',
+  email: 'admin@example.com',
+  app_metadata: {},
+  user_metadata: { full_name: 'Admin User' },
+  aud: 'authenticated',
+  created_at: new Date().toISOString(),
+  confirmed_at: new Date().toISOString(),
+  last_sign_in_at: new Date().toISOString(),
+  role: 'authenticated',
+  factor_id: null,
+  phone: '',
+} as User;
+
+const MOCK_PROFILE: UserProfile = {
+  id: 'mock-profile-id',
+  user_id: '00000000-0000-0000-0000-000000000000',
+  email: 'admin@example.com',
+  full_name: 'Admin User',
+  avatar_url: null,
+  phone: null,
+};
+
+const MOCK_ROLES: AppRole[] = ['admin', 'ops', 'support', 'client'];
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(MOCK_USER);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [roles, setRoles] = useState<AppRole[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState<UserProfile | null>(MOCK_PROFILE);
+  const [roles, setRoles] = useState<AppRole[]>(MOCK_ROLES);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Set up auth state listener first
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
         if (session?.user) {
-          // Defer fetching profile and roles
-          setTimeout(() => {
-            fetchUserData(session.user.id);
-          }, 0);
+          setSession(session);
+          setUser(session.user);
+          fetchUserData(session.user.id);
         } else {
-          setProfile(null);
-          setRoles([]);
+          // Keep mock user if no real session
+          setSession(null);
+          setUser(MOCK_USER);
+          setProfile(MOCK_PROFILE);
+          setRoles(MOCK_ROLES);
           setIsLoading(false);
         }
       }
@@ -56,10 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
       if (session?.user) {
+        setSession(session);
+        setUser(session.user);
         fetchUserData(session.user.id);
       } else {
         setIsLoading(false);
