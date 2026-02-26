@@ -25,12 +25,16 @@ import {
   Building2,
   FileText,
   Users,
+  LayoutDashboard,
+  ListFilter,
+  BookOpen,
 } from 'lucide-react';
 
 interface NavItem {
   label: string;
   href: string;
   icon: ReactNode;
+  exact?: boolean;
 }
 
 interface DashboardLayoutProps {
@@ -39,6 +43,7 @@ interface DashboardLayoutProps {
 }
 
 const clientNavItems: NavItem[] = [
+  { label: 'Dashboard', href: '/client', icon: <LayoutDashboard className="h-4 w-4" />, exact: true },
   { label: 'Support Tickets', href: '/client/tickets', icon: <Ticket className="h-4 w-4" /> },
   { label: 'Projects', href: '/client/hours', icon: <FolderKanban className="h-4 w-4" /> },
   { label: 'Documents', href: '/client/documents', icon: <FileText className="h-4 w-4" /> },
@@ -46,8 +51,12 @@ const clientNavItems: NavItem[] = [
 ];
 
 const staffNavItems: NavItem[] = [
+  { label: 'Overview', href: '/ops', icon: <LayoutDashboard className="h-4 w-4" />, exact: true },
   { label: 'Ticket Queue', href: '/support/tickets', icon: <Ticket className="h-4 w-4" /> },
+  { label: 'Ticket Triage', href: '/ops/triage', icon: <ListFilter className="h-4 w-4" /> },
   { label: 'Client Management', href: '/ops/clients', icon: <Building2 className="h-4 w-4" /> },
+  { label: 'Support Clients', href: '/support/clients', icon: <Building2 className="h-4 w-4" /> },
+  { label: 'Content Management', href: '/ops/content', icon: <BookOpen className="h-4 w-4" /> },
   { label: 'Staff Management', href: '/ops/staff', icon: <Users className="h-4 w-4" /> },
 ];
 
@@ -73,7 +82,9 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
   const headerTitle = isStaff ? 'Team Portal' : 'Client Portal';
 
   const renderNavItem = (item: NavItem) => {
-    const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/');
+    const isActive = item.exact
+      ? location.pathname === item.href
+      : location.pathname === item.href || location.pathname.startsWith(item.href + '/');
     return (
       <Link
         key={item.href}
@@ -206,7 +217,7 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
 
       {/* Main content */}
       <main className="lg:pl-64">
-        <div className="min-h-screen">{children}</div>
+        <div className="min-h-screen pb-16">{children}</div>
       </main>
     </div>
   );
